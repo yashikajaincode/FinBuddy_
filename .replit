@@ -1,0 +1,127 @@
+modules = ["python-3.11", "nodejs-20", "postgresql-16"]
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["sh", "-c", "streamlit run app.py --server.port 5000"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "FinBuddy Backend"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "FinBuddy Frontend"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "LoadingScreenDemo"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "HTML Demo"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Responsive FinBuddy"
+
+[[workflows.workflow]]
+name = "FinBuddy Backend"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd finbuddy-react/backend && npm run dev"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "FinBuddy Frontend"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd finbuddy-react/frontend && PORT=5001 npm start"
+waitForPort = 5001
+
+[[workflows.workflow]]
+name = "LoadingScreenDemo"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd . && python -m http.server 5000 --bind 0.0.0.0"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "HTML Demo"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd demo && python -m http.server 8080 --bind 0.0.0.0"
+waitForPort = 8080
+
+[[workflows.workflow]]
+name = "Responsive FinBuddy"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd responsive-demo && python -m http.server 5000 --bind 0.0.0.0"
+waitForPort = 5000
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 5001
+externalPort = 3000
+
+[[ports]]
+localPort = 5002
+externalPort = 3001
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
